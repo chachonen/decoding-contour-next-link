@@ -1328,6 +1328,109 @@ def pumpDownload(mt):
 #    print (binascii.hexlify( mt.doRemoteBolus( 1, 0.1, 0 ).responsePayload ))
 #    print (binascii.hexlify( mt.doRemoteBolus( 1, 0.1, 1 ).responsePayload ))
     
+def sendBTAdvertisment(str):
+    strLen = len(str)
+    strHex = " ".join("{:02x}".format(ord(c)) for c in str)
+    # which hcitool 
+    # sudo setcap cap_net_raw+ep /usr/bin/hcitool
+    # subprocess.run(["ls", "-l"])
+    # sudo hcitool -i hci0 cmd 0xFF 0xFFFF 1E 02 01 1A 1A FF 4C 00 02 15 E2 0A 39 F4 73 F5 4B C4 A1 2F 17 D1 AD 07 A9 61 00 00 00 00 C8 00
+    # subprocess.run(["hcitool", "-i", "hci0", "cmd", "0xFF", "0xFFFF", format(strLen, 'x').upper(), strHex])
+    # -i hci0 cmd 0xFF 0xFFFF 1E 02 01 1A 1A FF 4C 00 02 15 E2 0A 39 F4 73 F5 4B C4 A1 2F 17 D1 AD 07 A9 61 00 00 00 00 C8 00
+    # TODO: check if data format is correct and does not need any appending bytes
+    print(strHex)
+
+def customPumpStatus(mt):
+    status = mt.getPumpStatus()
+
+    str = "{0}-P-{1}-{2}-{3}-{4}".format( status.sensorBGLTimestamp.strftime( "%Y%m%d%H%M" ),
+            status.sensorBGL,
+            status.batteryLevelPercentage,
+            status.tempBasalPercentage,
+            int(status.insulinUnitsRemaining * 10))
+    print (str)
+    sendBTAdvertisment(str)
+
+    # print (binascii.hexlify( status.responsePayload ))
+    # print ("Active Insulin: {0:.3f}U".format( status.activeInsulin ))
+    # print ("Sensor BGL: {0} mg/dL ({1:.1f} mmol/L) at {2}".format( status.sensorBGL,
+    #          status.sensorBGL / 18.016,
+    #          status.sensorBGLTimestamp.strftime( "%c" ) ))
+    # print ("BGL trend: {0}".format( status.trendArrow ))
+    # print ("Current basal rate: {0:.3f}U".format( status.currentBasalRate ))
+
+    # # TODO: check if the percentage is 0 when the basal is blocked
+    # print ("Temp basal rate: {0:.3f}U".format( status.tempBasalRate ))
+    # print ("Temp basal percentage: {0}%".format( status.tempBasalPercentage ))
+    # print ("Units remaining: {0:.3f}U".format( status.insulinUnitsRemaining ))
+    # print ("Battery remaining: {0}%".format( status.batteryLevelPercentage ))
+
+def customPumpHistory(mt, minutes = 120):
+    # TODO: when is the history required???
+    print ("Getting Pump history info")
+    start_date = datetime.datetime.now() - datetime.timedelta(minutes)
+    historyInfo = mt.getPumpHistoryInfo(start_date, datetime.datetime.max, HISTORY_DATA_TYPE.PUMP_DATA)
+    # print (binascii.hexlify( historyInfo.responsePayload,  ))
+    # print (" Pump Start: {0}".format(historyInfo.datetimeStart))
+    # print (" Pump End: {0}".format(historyInfo.datetimeEnd));
+    # print (" Pump Size: {0}".format(historyInfo.historySize));
+    
+    # print ("Getting Pump history")
+    history_pages = mt.getPumpHistory(historyInfo.historySize, start_date, datetime.datetime.max, HISTORY_DATA_TYPE.PUMP_DATA)
+
+    # Uncomment to save events for testing without Pump (use: tests/process_saved_history.py)
+    #with open('history_data.dat', 'wb') as output:
+    #    pickle.dump(history_pages, output)
+
+    events = mt.processPumpHistory(history_pages, HISTORY_DATA_TYPE.PUMP_DATA)
+    return events
+
+def customSensorHistory(mt, minutes = 120):
+    # print ("Getting sensor history info")
+    sensHistoryInfo = mt.getPumpHistoryInfo(start_date, datetime.datetime.max, HISTORY_DATA_TYPE.SENSOR_DATA)
+    # print (binascii.hexlify( historyInfo.responsePayload,  ))
+    # print (" Sensor Start: {0}".format(sensHistoryInfo.datetimeStart))
+    # print (" Sensor End: {0}".format(sensHistoryInfo.datetimeEnd));
+    # print (" Sensor Size: {0}".format(sensHistoryInfo.historySize));
+    
+    # print ("Getting Sensor history")
+    sensor_history_pages = mt.getPumpHistory(sensHistoryInfo.historySize, start_date, datetime.datetime.max, HISTORY_DATA_TYPE.SENSOR_DATA)
+
+    # Uncomment to save events for testing without Pump (use: tests/process_saved_history.py)
+    #with open('sensor_history_data.dat', 'wb') as output:
+    #    pickle.dump(sensor_history_pages, output)
+
+    sensorEvents = mt.processPumpHistory(sensor_history_pages, HISTORY_DATA_TYPE.SENSOR_DATA)
+    return sensorEvents
+    # print ("# All Sensor events:")
+    # for ev in sensorEvents:
+    #     print (" Sensor", ev)
+    # print ("# End Sensor events")
+
+# Commented code to try remote bolusing...
+#    print (binascii.hexlify( mt.do405Message( pumpDatetime.encodedDatetime ).responsePayload ))
+#    print (binascii.hexlify( mt.do124Message( pumpDatetime.encodedDatetime ).responsePayload ))
+#    print (binascii.hexlify( mt.getBasicParameters().responsePayload ))
+#    print (binascii.hexlify( mt.getTempBasalStatus().responsePayload ))
+#    print (binascii.hexlify( mt.getBolusesStatus().responsePayload ))
+#    print (binascii.hexlify( mt.doRemoteBolus( 1, 0.1, 0 ).responsePayload ))
+#    print (binascii.hexlify( mt.doRemoteBolus( 1, 0.1, 1 ).responsePayload ))
 
 if __name__ == '__main__':
-    downloadPumpSession(pumpDownload)
+    downloadPumpSession(customPumpStatus)
+
+    # print (binascii.hexlify( status.responsePayload ))
+    # print ("Active Insulin: {0:.3f}U".format( status.activeInsulin ))
+    # print ("Sensor BGL: {0} mg/dL ({1:.1f} mmol/L) at {2}".format( status.sensorBGL,
+    #          status.sensorBGL / 18.016,
+    #          status.sensorBGLTimestamp.strftime( "%c" ) ))
+    # print ("BGL trend: {0}".format( status.trendArrow ))
+    # print ("Current basal rate: {0:.3f}U".format( status.currentBasalRate ))
+
+    # # TODO: check if the percentage is 0 when the basal is blocked
+    # print ("Temp basal rate: {0:.3f}U".format( status.tempBasalRate ))
+    # print ("Temp basal percentage: {0}%".format( status.tempBasalPercentage ))
+    # print ("Units remaining: {0:.3f}U".format( status.insulinUnitsRemaining ))
+    # print ("Battery remaining: {0}%".format( status.batteryLevelPercentage ))
+
+    # downloadPumpSession(pumpDownload)
