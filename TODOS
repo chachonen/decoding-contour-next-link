@@ -1,0 +1,14 @@
+TODO:
+Add BT broadcasting for pump status
+Add BT broadcasting for sensor history
+Add BT broadcasting for pump alarms (basal blocked, low battery)
+Inrease polling interval when LOW battery
+Enqueue periodically polling jobs
+Poll after sensor reads (sync times) max is a 5 minute interval (or 15 mins if battery is low)
+Add a queue to process the jobs one at a time
+BT sleep
+BT increase broadcasting interval
+
+ 
+DONE:
+
