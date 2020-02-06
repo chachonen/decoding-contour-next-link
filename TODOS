@@ -12,3 +12,34 @@ BT increase broadcasting interval
  
 DONE:
 
+
+
+
+NOTES:
+sudo hcitool -i hci0 cmd 0x08 0x0008 1E 02 01 1A 1A FF 4C 00 02 15 E2 0A 39 F4 73 F5 4B C4 A1 2F 17 D1
+sudo hcitool -i hci0 cmd 0x08 0x0008 1E 02 01 1A 1A FF 4C 00 02 15 E2 0A 39 F4 73 F5 4B C4 A1 2F 17 D1 AD 07 A9 61 00 00 00 00 C8 00
+bluetoothctl 
+dmesg | grep -i blue
+ls /lib/firmware/
+ls /lib/firmware/brcm/
+sudo modprobe -r btusb
+sudo modprobe btusb
+dmesg | grep -i blue
+lsusb | grep -i blue
+brcm ls -al 
+dmesg | grep -i blue
+sudo systemctl status bluetooth
+ls /etc/services 
+cat /etc/services 
+find / bluetooth.service
+sudo pico /etc/systemd/system/bluetooth.target.wants/bluetooth.service
+sudo systemctl daemon-reload 
+sudo service bluetooth restart
+sudo service bluetooth status
+dmesg | grep -i blue
+sudo systemctl status bluetooth
+lsusb | grep -i blue
+dmesg | grep -i blue
+bluetoothctl 
+sudo hcitool -i hci0 cmd 0x08 0x0008 1E 02 01 1A 1A FF 4C 00 02 15 E2 0A 39 F4 73 F5 4B C4 A1 2F 17 D1
+sudo hcitool -i hci0 cmd 0x08 0x0008 1E 02 01 1A 1A FF 4C 00 02 15 E2 0A 39 F4 73 F5 4B C4 A1 2F 17 D1 AD 07 A9 61 00 00 00 00 C8 00

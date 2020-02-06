@@ -1417,6 +1417,7 @@ def customSensorHistory(mt, minutes = 120):
 #    print (binascii.hexlify( mt.doRemoteBolus( 1, 0.1, 1 ).responsePayload ))
 
 if __name__ == '__main__':
+    # UPDATED!!!!
     downloadPumpSession(customPumpStatus)
 
     # print (binascii.hexlify( status.responsePayload ))
