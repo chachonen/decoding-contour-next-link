@@ -1341,13 +1341,20 @@ def sendBTAdvertisment(str):
     print(strHex)
 
 def customPumpStatus(mt):
-    status = mt.getPumpStatus()
+    # status = mt.getPumpStatus()
 
-    str = "{0}-P-{1}-{2}-{3}-{4}".format( status.sensorBGLTimestamp.strftime( "%Y%m%d%H%M" ),
-            status.sensorBGL,
-            status.batteryLevelPercentage,
-            status.tempBasalPercentage,
-            int(status.insulinUnitsRemaining * 10))
+    str = "{0}-P-{1}-{2}-{3}-{4}".format( 
+	    datetime.datetime.now().strftime( "%Y%m%d%H%M" ),
+            107,
+            50,
+            100,
+            int(0.2 * 10))
+    #str = "{0}-P-{1}-{2}-{3}-{4}".format( 
+#	    status.sensorBGLTimestamp.strftime( "%Y%m%d%H%M" ),
+#            status.sensorBGL,
+#            status.batteryLevelPercentage,
+#            status.tempBasalPercentage,
+#            int(status.insulinUnitsRemaining * 10))
     print (str)
     sendBTAdvertisment(str)
 
@@ -1418,7 +1425,8 @@ def customSensorHistory(mt, minutes = 120):
 
 if __name__ == '__main__':
     # UPDATED!!!!
-    downloadPumpSession(customPumpStatus)
+    # downloadPumpSession(customPumpStatus)
+    customPumpStatus("")
 
     # print (binascii.hexlify( status.responsePayload ))
     # print ("Active Insulin: {0:.3f}U".format( status.activeInsulin ))
